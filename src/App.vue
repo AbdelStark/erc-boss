@@ -1,23 +1,18 @@
 <template>
     <div id="app">
         <app-nav-bar/>
+        <router-view/>
     </div>
 </template>
 
 <script>
 
-  import AppNavBar from "./components/AppNavBar";
-  import {mapState} from "vuex";
+    import AppNavBar from "./components/AppNavBar";
 
-  export default {
+    export default {
         name: 'App',
         components: {
             AppNavBar
-        },
-        computed: {
-            ...mapState([
-                'settings',
-            ])
         },
     }
 </script>

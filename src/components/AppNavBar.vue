@@ -1,14 +1,14 @@
 <template>
     <div>
         <b-navbar toggleable="lg" type="dark" variant="dark">
-            <b-navbar-brand href="#">ERC Boss</b-navbar-brand>
+            <b-navbar-brand @click="navToHome">ERC Boss</b-navbar-brand>
 
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item href="#">Deploy</b-nav-item>
-                    <b-nav-item href="#">Interact</b-nav-item>
+                    <b-nav-item @click="navToDeploy">Deploy</b-nav-item>
+                    <b-nav-item @click="navToInteract">Interact</b-nav-item>
                 </b-navbar-nav>
 
                 <!-- Right aligned nav items -->
@@ -41,6 +41,15 @@
     export default {
         name: "AppNavBar",
         methods: {
+            navToHome() {
+                this.$router.push({path: '/'});
+            },
+            navToDeploy() {
+                this.$router.push({path: '/deploy'});
+            },
+            navToInteract() {
+                this.$router.push({path: '/interact'});
+            },
             switchLangToEn() {
                 this.$store.state.settings.lang = 'EN';
             },
