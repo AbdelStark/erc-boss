@@ -27,7 +27,7 @@
                     <b-spinner small type="grow"></b-spinner>
                     Deploying...
                 </b-button>
-                <b-button type="reset" variant="danger">Reset</b-button>
+                <b-button class="ml-2" type="reset" variant="danger">Reset</b-button>
             </b-form-row>
         </b-form>
     </div>
