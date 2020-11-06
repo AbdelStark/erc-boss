@@ -3,11 +3,25 @@
         <b-form @reset="reset" @submit="deployERC" class="ml-2 mr-2">
             <b-input-group class="mt-3" prepend="ERC">
                 <b-form-select :options="form.ercOptions"
+                               @change="onChangeERCType"
                                class="mr-2"
                                v-model="form.ercType"></b-form-select>
             </b-input-group>
-            <b-form-row class="mt-2 ml-2 mr-2">
-
+            <div v-if="form.show['erc-20']">
+                <b-input-group class="mt-2" prepend="Name">
+                    <b-form-input
+                            required
+                            v-model="form['erc-20'].name"
+                    ></b-form-input>
+                </b-input-group>
+                <b-input-group class="mt-2" prepend="Symbol">
+                    <b-form-input
+                            required
+                            v-model="form['erc-20'].symbol"
+                    ></b-form-input>
+                </b-input-group>
+            </div>
+            <b-form-row class="mt-2 ml-1">
                 <b-button class="mr-2" type="submit" v-if="!this.form.loading" variant="primary">Deploy</b-button>
                 <b-button disabled v-if="this.form.loading" variant="primary">
                     <b-spinner small type="grow"></b-spinner>
@@ -33,6 +47,11 @@
                         {value: 'erc-721', text: 'ERC-721 Non-Fungible Token Standard'},
                     ],
                     loading: false,
+                    show: initShowForms(),
+                    "erc-20": {
+                        name: '',
+                        symbol: '',
+                    },
                 },
             }
         },
@@ -44,9 +63,11 @@
                 const erc = this.$store.state.ercContracts[this.form.ercType];
                 const form = this.form;
                 const fromAddress = window.ethereum.selectedAddress;
+                const name = this.form["erc-20"].name;
+                const symbol = this.form["erc-20"].symbol;
                 erc.contract.deploy({
                     data: erc.code,
-                    arguments: ['erc20 test token', 'ETT'],
+                    arguments: [name, symbol],
                 })
                     .send({
                         from: fromAddress,
@@ -69,8 +90,19 @@
             reset(evt) {
                 evt.preventDefault();
                 this.form.ercType = null;
+                this.form.show = initShowForms();
+            },
+            onChangeERCType(selected){
+              this.form.show = initShowForms();
+              this.form.show[selected] = true;
             },
         }
+    }
+
+    function initShowForms(){
+        return {
+            "erc-20": false,
+        };
     }
 </script>
 
