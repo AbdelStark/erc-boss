@@ -106,6 +106,39 @@
                     </b-card-body>
                 </b-collapse>
             </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-transfer-from variant="dark">Transfer from</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-transfer-from" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-input-group prepend="Sender" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="transferFrom.sender" placeholder="Enter sender address"></b-form-input>
+                        </b-input-group>
+                        <b-input-group prepend="Recipient" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="transferFrom.recipient"
+                                    placeholder="Enter recipient address"></b-form-input>
+                        </b-input-group>
+                        <b-input-group prepend="Amount" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="transferFrom.amount" placeholder="Enter amount"></b-form-input>
+                            <b-input-group-append v-if="!transferFrom.inProgress">
+                                <b-button-group class="mx-1">
+                                    <b-button @click="sendTransferFrom">&raquo;</b-button>
+                                </b-button-group>
+                            </b-input-group-append>
+                            <b-input-group-append v-if="transferFrom.inProgress">
+                                <b-spinner label="Spinning"></b-spinner>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
         </div>
     </div>
 </template>
@@ -138,6 +171,13 @@
                 },
                 approve: {
                     spender: '',
+                    amount: 0,
+                    receipt: null,
+                    inProgress: false,
+                },
+                transferFrom: {
+                    sender: '',
+                    recipient: '',
                     amount: 0,
                     receipt: null,
                     inProgress: false,
@@ -178,6 +218,16 @@
                         console.log(receipt);
                         transferReturn.receipt = receipt;
                         transferReturn.inProgress = false;
+                    });
+            },
+            async sendTransferFrom() {
+                this.transferFrom.inProgress = true;
+                const transferFromReturn = this.transferFrom;
+                this.contract.methods.transferFrom(this.transferFrom.sender, this.transferFrom.recipient, this.transferFrom.amount).send()
+                    .then(function (receipt) {
+                        console.log(receipt);
+                        transferFromReturn.receipt = receipt;
+                        transferFromReturn.inProgress = false;
                     });
             },
             async sendApprove() {
