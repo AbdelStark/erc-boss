@@ -1,8 +1,6 @@
 <template>
-    <div>
-        Name: {{this.info.name}} <br/>
-        Symbol: {{this.info.symbol}} <br />
-        Total supply: {{this.info.totalSupply}}
+    <div class="mt-2 ml-2 mr-2">
+        <b-table v-if="info.loaded" striped hover :items="items"></b-table>
     </div>
 </template>
 
@@ -15,11 +13,8 @@
         data() {
             return {
                 contract: null,
-                info: {
-                    name: null,
-                    symbol: null,
-                    totalSupply: null,
-                },
+                info: emptyInfo(),
+                items: infoToItems(emptyInfo()),
             }
         },
         computed: {
@@ -39,8 +34,23 @@
             this.info.name = await this.contract.methods.name().call();
             this.info.symbol = await this.contract.methods.symbol().call();
             this.info.totalSupply = await this.contract.methods.totalSupply().call();
+            this.items = infoToItems(this.info);
+            this.info.loaded = true;
         },
     }
+
+    function emptyInfo(){
+        return {
+            name: '',
+            symbol: '',
+            totalSupply: '',
+            loaded: false,
+        }
+    }
+    function infoToItems(info) {
+        return [{name: info.name, symbol: info.symbol, totalSupply: info.totalSupply}];
+    }
+
 </script>
 
 <style scoped>

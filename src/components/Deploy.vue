@@ -20,6 +20,12 @@
                             v-model="form['erc-20'].symbol"
                     ></b-form-input>
                 </b-input-group>
+                <b-input-group class="mt-2" prepend="Initial supply">
+                    <b-form-input
+                            required
+                            v-model="form['erc-20'].initialSupply"
+                    ></b-form-input>
+                </b-input-group>
             </div>
             <b-form-row class="mt-2 ml-1">
                 <b-button class="mr-2" type="submit" v-if="!this.form.loading" variant="primary">Deploy</b-button>
@@ -51,6 +57,7 @@
                     "erc-20": {
                         name: '',
                         symbol: '',
+                        initialSupply: '',
                     },
                 },
             }
@@ -62,12 +69,11 @@
                 evt.preventDefault();
                 const erc = this.$store.state.ercContracts[this.form.ercType];
                 const form = this.form;
+                const erc20Form = this.form["erc-20"];
                 const fromAddress = window.ethereum.selectedAddress;
-                const name = this.form["erc-20"].name;
-                const symbol = this.form["erc-20"].symbol;
                 erc.contract.deploy({
                     data: erc.code,
-                    arguments: [name, symbol, '1000000000000000000000'],
+                    arguments: [erc20Form.name, erc20Form.symbol, erc20Form.initialSupply],
                 })
                     .send({
                         from: fromAddress,

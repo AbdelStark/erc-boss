@@ -21,7 +21,7 @@
 </template>
 
 <script>
-    import Erc20Form from "./erc/Erc20Form";
+    import Erc20Form from "./erc/interact/Erc20Form";
 
     export default {
         name: "Interact",
@@ -53,10 +53,6 @@
                 this.form.address = null;
                 this.form.show = initShowForms();
             },
-            /*onChangeERCType(selected) {
-                this.form.show = initShowForms();
-                this.form.show[selected] = true;
-            },*/
         },
     }
 
