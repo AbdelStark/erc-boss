@@ -1,17 +1,58 @@
 <template>
     <div class="mt-2 ml-2 mr-2" v-if="info.loaded">
         <b-table striped hover :items="items"></b-table>
-        <b-input-group prepend="Balance" class="mt-2">
-            <b-form-input
-                    class="mr-2"
-                    v-model="balanceOf.address" placeholder="Enter account address"></b-form-input>
-            <b-button v-if="balanceOf.balance != null" disabled variant="outline-info">{{balanceOf.balance}}</b-button>
-            <b-input-group-append>
-                <b-button-group class="mx-1">
-                    <b-button @click="callBalanceOf">&raquo;</b-button>
-                </b-button-group>
-            </b-input-group-append>
-        </b-input-group>
+        <div class="accordion mt-2" role="tablist">
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-balance-of variant="dark">Balance Of</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-balance-of" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-input-group prepend="Account" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="balanceOf.address" placeholder="Enter account address"></b-form-input>
+                            <b-button v-if="balanceOf.balance != null" disabled variant="outline-info">
+                                {{balanceOf.balance}}
+                            </b-button>
+                            <b-input-group-append>
+                                <b-button-group class="mx-1">
+                                    <b-button @click="callBalanceOf">&raquo;</b-button>
+                                </b-button-group>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-transfer variant="dark">Transfer</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-transfer" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-input-group prepend="From" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="transfer.recipient" placeholder="Enter recipient address"></b-form-input>
+                        </b-input-group>
+                        <b-input-group prepend="Amount" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="transfer.amount" placeholder="Enter amount"></b-form-input>
+                            <b-input-group-append v-if="!transfer.inProgress">
+                                <b-button-group class="mx-1">
+                                    <b-button @click="sendTransfer">&raquo;</b-button>
+                                </b-button-group>
+                            </b-input-group-append>
+                            <b-input-group-append v-if="transfer.inProgress">
+                                <b-spinner label="Spinning"></b-spinner>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+        </div>
     </div>
 </template>
 
@@ -30,6 +71,12 @@
                     address: '',
                     balance: null,
                 },
+                transfer: {
+                    recipient: '',
+                    amount: 0,
+                    receipt: null,
+                    inProgress: false,
+                },
             }
         },
         computed: {
@@ -45,7 +92,6 @@
                 this.address,
                 {from: fromAddress}
             );
-            console.log(this.contract);
             this.info.name = await this.contract.methods.name().call();
             this.info.symbol = await this.contract.methods.symbol().call();
             this.info.totalSupply = await this.contract.methods.totalSupply().call();
@@ -55,7 +101,17 @@
         methods: {
             async callBalanceOf() {
                 this.balanceOf.balance = await this.contract.methods.balanceOf(this.balanceOf.address).call();
-            }
+            },
+            async sendTransfer() {
+                this.transfer.inProgress = true;
+                const transferReturn = this.transfer;
+                this.contract.methods.transfer(this.transfer.recipient, this.transfer.amount).send()
+                    .then(function (receipt) {
+                        console.log(receipt);
+                        transferReturn.receipt = receipt;
+                        transferReturn.inProgress = false;
+                    });
+            },
         },
     }
 
