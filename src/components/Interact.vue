@@ -45,7 +45,9 @@
             loadERCForm(evt) {
                 evt.preventDefault();
                 this.form.show = initShowForms();
-                this.form.show[this.form.ercType] = true;
+                this.$nextTick(() => {
+                    this.form.show[this.form.ercType] = true;
+                });
             },
             reset(evt) {
                 evt.preventDefault();
