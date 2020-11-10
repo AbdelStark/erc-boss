@@ -52,6 +52,60 @@
                     </b-card-body>
                 </b-collapse>
             </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-allowance variant="dark">Allowance</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-allowance" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-input-group prepend="Owner" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="allowance.owner" placeholder="Enter owner address"></b-form-input>
+                        </b-input-group>
+                        <b-input-group prepend="Spender" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="allowance.spender" placeholder="Enter spender address"></b-form-input>
+                            <b-button v-if="allowance.returnValue != null" disabled variant="outline-info">
+                                {{allowance.returnValue}}
+                            </b-button>
+                            <b-input-group-append>
+                                <b-button-group class="mx-1">
+                                    <b-button @click="callAllowance">&raquo;</b-button>
+                                </b-button-group>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
+            <b-card no-body class="mb-1">
+                <b-card-header header-tag="header" class="p-1" role="tab">
+                    <b-button block v-b-toggle.accordion-approve variant="dark">Approve</b-button>
+                </b-card-header>
+                <b-collapse id="accordion-approve" accordion="my-accordion" role="tabpanel">
+                    <b-card-body>
+                        <b-input-group prepend="Spender" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="approve.spender" placeholder="Enter spender address"></b-form-input>
+                        </b-input-group>
+                        <b-input-group prepend="Amount" class="mt-2">
+                            <b-form-input
+                                    class="mr-2"
+                                    v-model="approve.amount" placeholder="Enter amount"></b-form-input>
+                            <b-input-group-append v-if="!approve.inProgress">
+                                <b-button-group class="mx-1">
+                                    <b-button @click="sendApprove">&raquo;</b-button>
+                                </b-button-group>
+                            </b-input-group-append>
+                            <b-input-group-append v-if="approve.inProgress">
+                                <b-spinner label="Spinning"></b-spinner>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-card-body>
+                </b-collapse>
+            </b-card>
         </div>
     </div>
 </template>
@@ -73,6 +127,17 @@
                 },
                 transfer: {
                     recipient: '',
+                    amount: 0,
+                    receipt: null,
+                    inProgress: false,
+                },
+                allowance: {
+                    owner: '',
+                    spender: '',
+                    returnValue: null,
+                },
+                approve: {
+                    spender: '',
                     amount: 0,
                     receipt: null,
                     inProgress: false,
@@ -102,6 +167,9 @@
             async callBalanceOf() {
                 this.balanceOf.balance = await this.contract.methods.balanceOf(this.balanceOf.address).call();
             },
+            async callAllowance() {
+                this.allowance.returnValue = await this.contract.methods.allowance(this.allowance.owner, this.allowance.spender).call();
+            },
             async sendTransfer() {
                 this.transfer.inProgress = true;
                 const transferReturn = this.transfer;
@@ -110,6 +178,16 @@
                         console.log(receipt);
                         transferReturn.receipt = receipt;
                         transferReturn.inProgress = false;
+                    });
+            },
+            async sendApprove() {
+                this.approve.inProgress = true;
+                const approveReturn = this.approve;
+                this.contract.methods.approve(this.approve.spender, this.approve.amount).send()
+                    .then(function (receipt) {
+                        console.log(receipt);
+                        approveReturn.receipt = receipt;
+                        approveReturn.inProgress = false;
                     });
             },
         },
