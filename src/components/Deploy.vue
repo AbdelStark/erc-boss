@@ -67,7 +67,7 @@
                 const symbol = this.form["erc-20"].symbol;
                 erc.contract.deploy({
                     data: erc.code,
-                    arguments: [name, symbol],
+                    arguments: [name, symbol, '1000000000000000000000'],
                 })
                     .send({
                         from: fromAddress,
