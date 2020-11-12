@@ -1,12 +1,16 @@
 <template>
     <div>
         <b-form @reset="reset" @submit="deployERC" class="ml-2 mr-2">
-            <b-input-group class="mt-3" prepend="ERC">
+            <b-alert class="mt-3" dismissible v-model="alert.success.show" variant="success">
+                {{alert.success.message}}
+            </b-alert>
+            <b-input-group class="mt-2" prepend="ERC">
                 <b-form-select :options="form.ercOptions"
                                @change="onChangeERCType"
                                class="mr-2"
                                v-model="form.ercType"></b-form-select>
             </b-input-group>
+
             <div v-if="form.show['erc-20']">
                 <b-input-group class="mt-2" prepend="Name">
                     <b-form-input
@@ -34,6 +38,9 @@
                     Deploying...
                 </b-button>
                 <b-button class="ml-2" type="reset" variant="danger">Reset</b-button>
+                <b-button @click="goInteract" class="ml-2" type="submit" v-if="this.form.showInteractButton"
+                          variant="info">Interact
+                </b-button>
             </b-form-row>
         </b-form>
     </div>
@@ -45,6 +52,12 @@
         name: "Deploy",
         data() {
             return {
+                alert: {
+                    success: {
+                        show: false,
+                        message: '',
+                    },
+                },
                 form: {
                     ercType: null,
                     ercOptions: [
@@ -54,11 +67,16 @@
                     ],
                     loading: false,
                     show: initShowForms(),
+                    showInteractButton: false,
                     "erc-20": {
                         name: '',
                         symbol: '',
                         initialSupply: '',
                     },
+                    deployed: {
+                        ercType: null,
+                        contractAddress: null,
+                    }
                 },
             }
         },
@@ -71,6 +89,7 @@
                 const form = this.form;
                 const erc20Form = this.form["erc-20"];
                 const fromAddress = window.ethereum.selectedAddress;
+                const currentDeployVue = this;
                 erc.contract.deploy({
                     data: erc.code,
                     arguments: [erc20Form.name, erc20Form.symbol, erc20Form.initialSupply],
@@ -86,11 +105,19 @@
                         }
                     })
                     .on('receipt', function (receipt) {
-                        console.log(receipt.contractAddress) // contains the new contract address
+                        console.log(receipt.contractAddress); // contains the new contract address
+                        currentDeployVue.$nextTick(() => {
+                            console.log('contract deployed at: ', receipt.contractAddress);
+                            form.deployed.ercType = currentDeployVue.form.ercType;
+                            form.deployed.contractAddress = receipt.contractAddress;
+                            form.loading = false;
+                            form.showInteractButton = true;
+                            currentDeployVue.alert.success.message = `Contract successfully deployed at ${receipt.contractAddress}`;
+                            currentDeployVue.alert.success.show = true;
+                        });
                     })
                     .then(async function (newContractInstance) {
                         console.log(newContractInstance);
-                        form.loading = false;
                     });
             },
             reset(evt) {
@@ -98,14 +125,20 @@
                 this.form.ercType = null;
                 this.form.show = initShowForms();
             },
-            onChangeERCType(selected){
-              this.form.show = initShowForms();
-              this.form.show[selected] = true;
+            onChangeERCType(selected) {
+                this.form.show = initShowForms();
+                this.form.show[selected] = true;
+            },
+            goInteract() {
+                const ercType = this.form.deployed.ercType;
+                const contractAddress = this.form.deployed.contractAddress;
+                const path = `/interact/${ercType}/${contractAddress}`;
+                this.$router.push(path);
             },
         }
     }
 
-    function initShowForms(){
+    function initShowForms() {
         return {
             "erc-20": false,
         };

@@ -6,17 +6,17 @@
                                class="mr-2"
                                v-model="form.ercType"></b-form-select>
             </b-input-group>
-            <b-input-group prepend="At" class="mt-2">
+            <b-input-group class="mt-2" prepend="At">
                 <b-form-input
                         class="mr-2"
-                        v-model="form.address" placeholder="Enter smart contract address"></b-form-input>
+                        placeholder="Enter smart contract address" v-model="form.address"></b-form-input>
             </b-input-group>
             <b-form-row class="mt-2">
                 <b-button @click="loadERCForm" class="mr-2" variant="primary">Load</b-button>
                 <b-button @click="reset" variant="danger">Reset</b-button>
             </b-form-row>
         </b-form>
-        <erc20-form v-if="form.show['erc-20']" :address="form.address" class="ml-2 mr-2"/>
+        <erc20-form :address="form.address" class="ml-2 mr-2" v-if="form.show['erc-20']"/>
     </div>
 </template>
 
@@ -26,6 +26,14 @@
     export default {
         name: "Interact",
         components: {Erc20Form},
+        mounted() {
+            console.log(this.$route.params);
+            if (typeof this.$route.params.type !== 'undefined' && typeof this.$route.params.address !== 'undefined') {
+                this.form.ercType = this.$route.params.type;
+                this.form.address = this.$route.params.address;
+                this.loadERCForm(null);
+            }
+        },
         data() {
             return {
                 form: {
@@ -43,7 +51,9 @@
         },
         methods: {
             loadERCForm(evt) {
-                evt.preventDefault();
+                if (evt != null) {
+                    evt.preventDefault();
+                }
                 this.form.show = initShowForms();
                 this.$nextTick(() => {
                     this.form.show[this.form.ercType] = true;

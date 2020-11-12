@@ -1,18 +1,18 @@
 <template>
     <div class="mt-2 ml-2 mr-2" v-if="info.loaded">
-        <b-table striped hover :items="items"></b-table>
+        <b-table :items="items" hover striped></b-table>
         <div class="accordion mt-2" role="tablist">
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-card class="mb-1" no-body>
+                <b-card-header class="p-1" header-tag="header" role="tab">
                     <b-button block v-b-toggle.accordion-balance-of variant="dark">Balance Of</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-balance-of" accordion="my-accordion" role="tabpanel">
+                <b-collapse accordion="my-accordion" id="accordion-balance-of" role="tabpanel">
                     <b-card-body>
-                        <b-input-group prepend="Account" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Account">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="balanceOf.address" placeholder="Enter account address"></b-form-input>
-                            <b-button v-if="balanceOf.balance != null" disabled variant="outline-info">
+                                    placeholder="Enter account address" v-model="balanceOf.address"></b-form-input>
+                            <b-button disabled v-if="balanceOf.balance != null" variant="outline-info">
                                 {{balanceOf.balance}}
                             </b-button>
                             <b-input-group-append>
@@ -25,21 +25,21 @@
                 </b-collapse>
             </b-card>
 
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-card class="mb-1" no-body>
+                <b-card-header class="p-1" header-tag="header" role="tab">
                     <b-button block v-b-toggle.accordion-transfer variant="dark">Transfer</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-transfer" accordion="my-accordion" role="tabpanel">
+                <b-collapse accordion="my-accordion" id="accordion-transfer" role="tabpanel">
                     <b-card-body>
-                        <b-input-group prepend="From" class="mt-2">
+                        <b-input-group class="mt-2" prepend="From">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="transfer.recipient" placeholder="Enter recipient address"></b-form-input>
+                                    placeholder="Enter recipient address" v-model="transfer.recipient"></b-form-input>
                         </b-input-group>
-                        <b-input-group prepend="Amount" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Amount">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="transfer.amount" placeholder="Enter amount"></b-form-input>
+                                    placeholder="Enter amount" v-model="transfer.amount"></b-form-input>
                             <b-input-group-append v-if="!transfer.inProgress">
                                 <b-button-group class="mx-1">
                                     <b-button @click="sendTransfer">&raquo;</b-button>
@@ -52,22 +52,22 @@
                     </b-card-body>
                 </b-collapse>
             </b-card>
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-card class="mb-1" no-body>
+                <b-card-header class="p-1" header-tag="header" role="tab">
                     <b-button block v-b-toggle.accordion-allowance variant="dark">Allowance</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-allowance" accordion="my-accordion" role="tabpanel">
+                <b-collapse accordion="my-accordion" id="accordion-allowance" role="tabpanel">
                     <b-card-body>
-                        <b-input-group prepend="Owner" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Owner">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="allowance.owner" placeholder="Enter owner address"></b-form-input>
+                                    placeholder="Enter owner address" v-model="allowance.owner"></b-form-input>
                         </b-input-group>
-                        <b-input-group prepend="Spender" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Spender">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="allowance.spender" placeholder="Enter spender address"></b-form-input>
-                            <b-button v-if="allowance.returnValue != null" disabled variant="outline-info">
+                                    placeholder="Enter spender address" v-model="allowance.spender"></b-form-input>
+                            <b-button disabled v-if="allowance.returnValue != null" variant="outline-info">
                                 {{allowance.returnValue}}
                             </b-button>
                             <b-input-group-append>
@@ -79,21 +79,21 @@
                     </b-card-body>
                 </b-collapse>
             </b-card>
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-card class="mb-1" no-body>
+                <b-card-header class="p-1" header-tag="header" role="tab">
                     <b-button block v-b-toggle.accordion-approve variant="dark">Approve</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-approve" accordion="my-accordion" role="tabpanel">
+                <b-collapse accordion="my-accordion" id="accordion-approve" role="tabpanel">
                     <b-card-body>
-                        <b-input-group prepend="Spender" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Spender">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="approve.spender" placeholder="Enter spender address"></b-form-input>
+                                    placeholder="Enter spender address" v-model="approve.spender"></b-form-input>
                         </b-input-group>
-                        <b-input-group prepend="Amount" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Amount">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="approve.amount" placeholder="Enter amount"></b-form-input>
+                                    placeholder="Enter amount" v-model="approve.amount"></b-form-input>
                             <b-input-group-append v-if="!approve.inProgress">
                                 <b-button-group class="mx-1">
                                     <b-button @click="sendApprove">&raquo;</b-button>
@@ -106,27 +106,27 @@
                     </b-card-body>
                 </b-collapse>
             </b-card>
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-card class="mb-1" no-body>
+                <b-card-header class="p-1" header-tag="header" role="tab">
                     <b-button block v-b-toggle.accordion-transfer-from variant="dark">Transfer from</b-button>
                 </b-card-header>
-                <b-collapse id="accordion-transfer-from" accordion="my-accordion" role="tabpanel">
+                <b-collapse accordion="my-accordion" id="accordion-transfer-from" role="tabpanel">
                     <b-card-body>
-                        <b-input-group prepend="Sender" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Sender">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="transferFrom.sender" placeholder="Enter sender address"></b-form-input>
+                                    placeholder="Enter sender address" v-model="transferFrom.sender"></b-form-input>
                         </b-input-group>
-                        <b-input-group prepend="Recipient" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Recipient">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="transferFrom.recipient"
-                                    placeholder="Enter recipient address"></b-form-input>
+                                    placeholder="Enter recipient address"
+                                    v-model="transferFrom.recipient"></b-form-input>
                         </b-input-group>
-                        <b-input-group prepend="Amount" class="mt-2">
+                        <b-input-group class="mt-2" prepend="Amount">
                             <b-form-input
                                     class="mr-2"
-                                    v-model="transferFrom.amount" placeholder="Enter amount"></b-form-input>
+                                    placeholder="Enter amount" v-model="transferFrom.amount"></b-form-input>
                             <b-input-group-append v-if="!transferFrom.inProgress">
                                 <b-button-group class="mx-1">
                                     <b-button @click="sendTransferFrom">&raquo;</b-button>

@@ -18,7 +18,7 @@ const routes = [
         component: Deploy,
     },
     {
-        path: '/interact',
+        path: '/interact/:type?/:address?',
         name: 'interact',
         component: Interact,
     }
