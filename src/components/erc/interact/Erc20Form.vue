@@ -12,12 +12,13 @@
                             <b-form-input
                                     class="mr-2"
                                     placeholder="Enter account address" v-model="balanceOf.address"></b-form-input>
+                            <b-button variant="dark" class="mr-2" @click="fillBalanceOfAddressWithSelectedEthereumAddress">Me</b-button>
                             <b-button disabled v-if="balanceOf.balance != null" variant="outline-info">
                                 {{balanceOf.balance}}
                             </b-button>
                             <b-input-group-append>
                                 <b-button-group class="mx-1">
-                                    <b-button @click="callBalanceOf">&raquo;</b-button>
+                                    <b-button class="ml-2" @click="callBalanceOf">&raquo;</b-button>
                                 </b-button-group>
                             </b-input-group-append>
                         </b-input-group>
@@ -204,6 +205,9 @@
             this.info.loaded = true;
         },
         methods: {
+            fillBalanceOfAddressWithSelectedEthereumAddress(){
+                this.balanceOf.address = window.ethereum.selectedAddress;
+            },
             async callBalanceOf() {
                 this.balanceOf.balance = await this.contract.methods.balanceOf(this.balanceOf.address).call();
             },
